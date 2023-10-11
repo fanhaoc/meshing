@@ -1,19 +1,28 @@
 // meshing.cpp: 定义应用程序的入口点。
 //
 
-#include "meshing.h"
 #include "Octree.cpp"
 #include "ReadModel.cpp"
 #include "Visualization/Scene.cpp"
+#include "Visualization/Model.cpp"
 
 
 int main()
 {
+	// 图形显示模块
 	Scene* sc = new Scene();
-	sc->renderLoop();
+	
+
+	// 文件读取模块
 	//ReadModel* rm = new ReadModel();
 	//rm->read("C:/Users/19288/Desktop/coding/cxx/meshing/models/cylinder.obj");
-	//std::vector<aiVector3D> vertex = rm->processVertex(rm->meshes[0]);
+	//std::vector<Point> vertex = rm->processVertex(rm->meshes[0]);
+	//std::vector<unsigned int> indices = rm->processFace(rm->meshes[0]);
+	//Model* shape = new Model(vertex, indices);
+
+	//sc->add(shape);
+
+	sc->renderLoop();
 	//std::cout << "vertex count" << vertex.size() << std::endl;
 	//// 创建八叉树根节点
 	//Octree* otr = new Octree(6, 1, BoundingBox(Point(-10, -10, -10), Point(10, 10, 10)));

@@ -1,47 +1,10 @@
+#pragma once
 #include <vector>
 #include <iostream>
+#include "Types.h"
 
 const int MAX_DEPTH = 5; // 最大树深度
 const int MAX_PINTS = 1; // 每个立方体最多含有一个点
-
-struct  Point
-{
-	double x, y, z;
-	Point(double a, double b, double c) {
-		x = a;
-		y = b;
-		z = c;
-	}
-	Point():x(0), y(0), z(0){}
-};
-
-struct BoundingBox
-{
-	Point minCoord;
-	Point maxCoord;
-	BoundingBox(Point& min, Point& max) {
-		minCoord = min;
-		maxCoord = max;
-	}
-	BoundingBox() {
-		minCoord = Point();
-		maxCoord = Point();
-	}
-};
-
-struct OctreeNode
-{
-	BoundingBox bounds;
-	std::vector<Point> points;
-	OctreeNode* children[8]; // 子节点数组
-
-	OctreeNode(const BoundingBox& bbox) {
-		bounds = bbox;
-		for (int i = 0; i < 8; i++) {
-			children[i] = nullptr;
-		}
-	}
-};
 
 class Octree {
 public:
