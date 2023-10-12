@@ -13,6 +13,7 @@ int main()
 	Scene* sc = new Scene();
 	
 
+
 	// 文件读取模块
 	//ReadModel* rm = new ReadModel();
 	//rm->read("C:/Users/19288/Desktop/coding/cxx/meshing/models/cylinder.obj");

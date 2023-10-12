@@ -2,14 +2,23 @@
 #include <vector>
 #include "Model.cpp"
 #include "Shader.h"
+#include "Camera.h"
+#include "controller.h"
 #define GLFW_STATIC
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Scene {
 public:
 	GLFWwindow* window;
+	// 组件
+
+	// 绘制数据
 	std::vector<Model*> models;
+	std::vector<unsigned int> VAOS;
 	Scene() {
 		// 初始化glfw
 		glfwInit();
@@ -31,11 +40,17 @@ public:
 			glfwTerminate();
 		}
 		glViewport(0, 0, 800, 600);
+
+		// 初始化组件
+		camera = new Camera(glm::vec3(0, 0, 3.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0));
+		// 鼠标事件
+		glfwSetCursorPosCallback(window, mouse_callback);
 	}
 	// 循环绘制
 	void renderLoop() {
 		// 初始化一些渲染数据
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glEnable(GL_DEPTH_TEST);
 		//glEnable(GL_CULL_FACE);
 		//glCullFace(GL_BACK);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -51,22 +66,38 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		unsigned int EBO;
-		glGenBuffers(1, &EBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		//unsigned int EBO;
+		//glGenBuffers(1, &EBO);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+
+
 		
+		// mvp矩阵
+		glm::mat4 modelMat = glm::mat4(1.0f);
+		modelMat = glm::rotate(modelMat, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glm::mat4 viewMat = glm::mat4(1.0f);
+		viewMat = camera->getViewMatrix();
+
+		glm::mat4 projMat = glm::mat4(1.0f);
+		projMat = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
 		// 循环渲染
 		while (!glfwWindowShouldClose(window))
 		{
 			processInput();
 
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			
+			viewMat = camera->getViewMatrix();
+
+			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
+			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
+			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
 			//for (int i = 0, len = models.size(); i < len; i++) {
 			//	glBufferData(GL_ARRAY_BUFFER, sizeof(models[i]->vertices), &models[i]->vertices, GL_STATIC_DRAW);
 			//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(models[i]->indices), &models[i]->indices, GL_STATIC_DRAW);
@@ -74,9 +105,8 @@ public:
 			//}
 			shader->use();
 			glBindVertexArray(VAO);			
-			//glDrawArrays(GL_TRIANGLES, 0, 6);
-			
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -93,20 +123,71 @@ public:
 	// 添加需要绘制的模型
 	void add(Model* model) {
 		models.push_back(model);
+		unsigned int VAO;
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		unsigned int VBO;
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(model->vertices), &model->vertices, GL_STATIC_DRAW);
+
+		unsigned int EBO;
+		glGenBuffers(1, &EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(model->indices), &model->indices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		VAOS.push_back(VAO);
+
+		glBindVertexArray(0);
 	}
 
-	float vertices[12] = {
-		0.5f, 0.5f, 0.0f,   // 右上角
-		0.5f, -0.5f, 0.0f,  // 右下角
-		-0.5f, -0.5f, 0.0f, // 左下角
-		-0.5f, 0.5f, 0.0f   // 左上角
-	};
-	unsigned int indices[6] = {
-		// 注意索引从0开始! 
-		// 此例的索引(0,1,2,3)就是顶点数组vertices的下标，
-		// 这样可以由下标代表顶点组合成矩形
 
-		0, 1, 3, // 第一个三角形
-		1, 2, 3  // 第二个三角形
+
+	float vertices[180] = {
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 };
