@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <glm/glm.hpp>
+#include <string>
 struct  Point
 {
 	float x, y, z;
@@ -37,4 +39,16 @@ struct OctreeNode
 			children[i] = nullptr;
 		}
 	}
+};
+
+struct Vertex{
+	glm::vec3 Position;
+	glm::vec3 Normal;
+	glm::vec2 TexCoords;
+};
+
+struct Texture {
+	unsigned int id;
+	std::string type;
+	std::string path;
 };

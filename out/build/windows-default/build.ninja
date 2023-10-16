@@ -85,7 +85,7 @@ build CMakeFiles\meshing.dir\Visualization\Scene.cpp.obj: CXX_COMPILER__meshing_
   TARGET_COMPILE_PDB = CMakeFiles\meshing.dir\
   TARGET_PDB = meshing.pdb
 
-build CMakeFiles\meshing.dir\Visualization\Model.cpp.obj: CXX_COMPILER__meshing_unscanned_Debug C$:\Users\19288\Desktop\coding\cxx\meshing\Visualization\Model.cpp || cmake_object_order_depends_target_meshing
+build CMakeFiles\meshing.dir\Visualization\Mesh.cpp.obj: CXX_COMPILER__meshing_unscanned_Debug C$:\Users\19288\Desktop\coding\cxx\meshing\Visualization\Mesh.cpp || cmake_object_order_depends_target_meshing
   DEFINES = -D/utf-8 -DGLFW_DLL
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 /bigobj
   INCLUDES = -external:IC:\dev\vcpkg\installed\x64-windows\include -external:W0
@@ -129,7 +129,7 @@ build CMakeFiles\meshing.dir\Visualization\controller.cpp.obj: CXX_COMPILER__mes
 #############################################
 # Link the executable meshing.exe
 
-build meshing.exe: CXX_EXECUTABLE_LINKER__meshing_Debug CMakeFiles\meshing.dir\meshing.cpp.obj CMakeFiles\meshing.dir\ReadModel.cpp.obj CMakeFiles\meshing.dir\Octree.cpp.obj CMakeFiles\meshing.dir\Visualization\Scene.cpp.obj CMakeFiles\meshing.dir\Visualization\Model.cpp.obj CMakeFiles\meshing.dir\Visualization\Shader.cpp.obj CMakeFiles\meshing.dir\Visualization\Camera.cpp.obj CMakeFiles\meshing.dir\Visualization\controller.cpp.obj | C$:\dev\vcpkg\installed\x64-windows\debug\lib\assimp-vc142-mtd.lib C$:\dev\vcpkg\installed\x64-windows\debug\lib\glfw3dll.lib C$:\dev\vcpkg\installed\x64-windows\debug\lib\glad.lib C$:\dev\vcpkg\installed\x64-windows\debug\lib\pugixml.lib
+build meshing.exe: CXX_EXECUTABLE_LINKER__meshing_Debug CMakeFiles\meshing.dir\meshing.cpp.obj CMakeFiles\meshing.dir\ReadModel.cpp.obj CMakeFiles\meshing.dir\Octree.cpp.obj CMakeFiles\meshing.dir\Visualization\Scene.cpp.obj CMakeFiles\meshing.dir\Visualization\Mesh.cpp.obj CMakeFiles\meshing.dir\Visualization\Shader.cpp.obj CMakeFiles\meshing.dir\Visualization\Camera.cpp.obj CMakeFiles\meshing.dir\Visualization\controller.cpp.obj | C$:\dev\vcpkg\installed\x64-windows\debug\lib\assimp-vc142-mtd.lib C$:\dev\vcpkg\installed\x64-windows\debug\lib\glfw3dll.lib C$:\dev\vcpkg\installed\x64-windows\debug\lib\glad.lib C$:\dev\vcpkg\installed\x64-windows\debug\lib\pugixml.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = C:\dev\vcpkg\installed\x64-windows\debug\lib\assimp-vc142-mtd.lib  C:\dev\vcpkg\installed\x64-windows\debug\lib\glfw3dll.lib  C:\dev\vcpkg\installed\x64-windows\debug\lib\glad.lib  C:\dev\vcpkg\installed\x64-windows\debug\lib\pugixml.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

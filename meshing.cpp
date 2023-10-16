@@ -4,7 +4,8 @@
 #include "Octree.cpp"
 #include "ReadModel.cpp"
 #include "Visualization/Scene.cpp"
-#include "Visualization/Model.cpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 
 int main()
