@@ -75,7 +75,7 @@ void processInput(GLFWwindow* window) {
 		camera->Position += glm::normalize(camera->Forward) * moveSense;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		camera->Position -= glm::normalize(camera->Forward) * moveSense;
+		camera->Position -= glm::normalize(camera->Forward) * moveSense; 
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		camera->Position += glm::normalize(camera->Right) * moveSense;
