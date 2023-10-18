@@ -17,13 +17,13 @@ public:
 		root = new OctreeNode(bbox);
 	}
 	// 计算点是否在边界框内
-	bool isPointInBox(const Point& point, const BoundingBox& box) {
+	bool isPointInBox(const glm::vec3 point, const BoundingBox& box) {
 		return (point.x >= box.minCoord.x && point.x <= box.maxCoord.x &&
 			point.y >= box.minCoord.y && point.y <= box.maxCoord.y &&
 			point.z >= box.minCoord.z && point.z <= box.maxCoord.z);
 	}
 	//插入点到八叉树中
-	void insertPoint(OctreeNode* node, const Point& point, int depth) {
+	void insertPoint(OctreeNode* node,glm::vec3 point, int depth) {
 		if (depth == MAX_DEPTH) {
 			node->points.push_back(point);
 			return;
@@ -54,7 +54,7 @@ public:
 		}
 	}
 	// 计算点在节点中的索引
-	int pointIndices(Point point, OctreeNode* node) {
+	int pointIndices(glm::vec3 point, OctreeNode* node) {
 		// 计算子节点的索引
 		int index = 0;
 		double centerX = (node->bounds.minCoord.x + node->bounds.maxCoord.x) / 2.0;
@@ -77,22 +77,22 @@ public:
 		double maxY = node->bounds.maxCoord.y;
 		double maxZ = node->bounds.maxCoord.z;
 		std::vector<BoundingBox> bd;
-		bd.push_back(BoundingBox(node->bounds.minCoord, Point(centerX, centerY, centerZ))); // 第一个
-		bd.push_back(BoundingBox(Point(centerX, minY, minZ), Point(maxX, centerY, centerZ))); // 2
-		bd.push_back(BoundingBox(Point(minX, centerY, minZ), Point(centerX, maxY, centerZ))); // 3
-		bd.push_back(BoundingBox(Point(centerX, centerY, minZ), Point(maxX, maxY, centerZ))); // 4
+		bd.push_back(BoundingBox(node->bounds.minCoord, glm::vec3(centerX, centerY, centerZ))); // 第一个
+		bd.push_back(BoundingBox(glm::vec3(centerX, minY, minZ), glm::vec3(maxX, centerY, centerZ))); // 2
+		bd.push_back(BoundingBox(glm::vec3(minX, centerY, minZ), glm::vec3(centerX, maxY, centerZ))); // 3
+		bd.push_back(BoundingBox(glm::vec3(centerX, centerY, minZ), glm::vec3(maxX, maxY, centerZ))); // 4
 
-		bd.push_back(BoundingBox(Point(minX, minY, centerZ), Point(centerX, centerY, maxZ))); // 5
-		bd.push_back(BoundingBox(Point(centerX, minY, centerZ), Point(maxX, centerY, maxZ))); // 6
-		bd.push_back(BoundingBox(Point(minX, centerY, centerZ), Point(centerX, maxY, maxZ))); // 7
-		bd.push_back(BoundingBox(Point(centerX, centerY, centerZ), node->bounds.maxCoord)); // 8
+		bd.push_back(BoundingBox(glm::vec3(minX, minY, centerZ), glm::vec3(centerX, centerY, maxZ))); // 5
+		bd.push_back(BoundingBox(glm::vec3(centerX, minY, centerZ), glm::vec3(maxX, centerY, maxZ))); // 6
+		bd.push_back(BoundingBox(glm::vec3(minX, centerY, centerZ), glm::vec3(centerX, maxY, maxZ))); // 7
+		bd.push_back(BoundingBox(glm::vec3(centerX, centerY, centerZ), node->bounds.maxCoord)); // 8
 
 		for (int i = 0; i < 8; i++) {
 			node->children[i] = new OctreeNode(bd[i]);
 		}
 	}
 	// 遍历八叉树，获取所有的数据
-	void getAllPoints(OctreeNode* node,int depth, std::vector<Point>& points) {
+	void getAllPoints(OctreeNode* node,int depth, std::vector< glm::vec3>& points) {
 		if (node == nullptr) return;
 		for (int i = 0; i < node->points.size(); i++) {
 			points.push_back(node->points[i]);

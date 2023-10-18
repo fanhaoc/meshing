@@ -6,6 +6,8 @@
 #include "Material.h"
 #include "Lights/Light.h"
 #include "Lights/LightSpot.h"
+#include "Mesh.h"
+#include "Model.h"
 #define GLFW_STATIC
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -19,9 +21,10 @@ public:
 	GLFWwindow* window;
 	// 组件
 	Material* material;
+	
 	// 数据根目录
 	std::string rootPath = "C:\\Users\\19288\\Desktop\\coding\\cxx\\meshing";
-
+	std::vector<Model*> models;
 	std::vector<unsigned int> VAOS;
 	Scene() {
 		// 初始化glfw
@@ -53,7 +56,7 @@ public:
 		glfwSetScrollCallback(window, scroll_callback);
 	}
 	// 循环绘制
-	void renderLoop() {
+	void renderLoop(std::vector<glm::vec3>& position) {
 		// 初始化一些渲染数据
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
@@ -62,6 +65,7 @@ public:
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		Shader* shader = new Shader((rootPath + "\\Visualization\\ShaderSource\\normalVert.vert").c_str(), (rootPath+"\\Visualization\\ShaderSource\\normalFrag.frag").c_str());
+		Shader* shaderP = new Shader((rootPath + "\\Visualization\\ShaderSource\\pointVert.vert").c_str(), (rootPath + "\\Visualization\\ShaderSource\\pointFrag.frag").c_str());
 
 		material = new Material(shader,
 			LoadImageToGpu((rootPath + "\\sources\\container2.png").c_str(), GL_RGBA, GL_RGBA, Shader::DIFFUSE),
@@ -74,33 +78,19 @@ public:
 		Light* lightD = new Light(glm::vec3(0.0f, 10.0f, -5.0f), glm::vec3(glm::radians(45.0f), glm::radians(-45.0f), 0.0f), glm::vec3(2.0f, 2.0f, 2.0f));
 		Light* lightP = new Light(glm::vec3(0.0f, 1.0f, -1.0f), glm::vec3(glm::radians(45.0f), glm::radians(-45.0f), 0.0f), glm::vec3(0.0f, 2.0f, 2.0f));
 
-		unsigned int VAO;
-		glGenVertexArrays(1, &VAO);
-		glBindVertexArray(VAO);
+		// Mesh* cube = new  Mesh(vertices);
+		//unsigned int VAO;
+		//glGenVertexArrays(1, &VAO);
+		//glBindVertexArray(VAO);
 
-		unsigned int VBO;
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		//unsigned int VBO;
+		//glGenBuffers(1, &VBO);
+		//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * position.size(), &position[0], GL_STATIC_DRAW);
 
-		//unsigned int EBO;
-		//glGenBuffers(1, &EBO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		//glEnableVertexAttribArray(0);
+		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);	
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-
-		//unsigned int TexBufferA;
-		//TexBufferA = LoadImageToGpu((rootPath + "\\sources\\container.jpg").c_str(), GL_RGB, GL_RGB, 0);
-		//unsigned int TexBufferB;
-		//TexBufferB = LoadImageToGpu((rootPath + "\\sources\\awesomeface.png").c_str(), GL_RGBA, GL_RGBA, 1);
 		
 		// mvp矩阵
 		glm::mat4 modelMat = glm::mat4(1.0f);
@@ -110,7 +100,7 @@ public:
 
 		glm::mat4 projMat = glm::mat4(1.0f);
 		
-
+		std::cout << position.size() << std::endl;
 		// 循环渲染
 		while (!glfwWindowShouldClose(window))
 		{
@@ -125,9 +115,6 @@ public:
 			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
 			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
-
-			// glUniform1i(glGetUniformLocation(shader->ID, "material.diffuse"), 0);
-			// glUniform1i(glGetUniformLocation(shader->ID, "ourFace"), 10);
 
 			glUniform3f(glGetUniformLocation(shader->ID, "objColor"), 1.0f, 1.0f, 1.0f);
 			glUniform3f(glGetUniformLocation(shader->ID, "ambientColor"), 0.2f, 0.4f, 0.4f);
@@ -149,33 +136,23 @@ public:
 			material->shader->setUniform1i("material.specular", Shader::SPECULAR);
 			material->shader->setUniform1i("material.emission", Shader::EMISSION);
 			material->shader->setUniform1f("material.shininess", material->shininess);
-			//for (int i = 0, len = models.size(); i < len; i++) {
-			//	glBufferData(GL_ARRAY_BUFFER, sizeof(models[i]->vertices), &models[i]->vertices, GL_STATIC_DRAW);
-			//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(models[i]->indices), &models[i]->indices, GL_STATIC_DRAW);
-			//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-			//}
-			shader->use();
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, material->diffuse);
-			glActiveTexture(GL_TEXTURE0 + 1);
-			glBindTexture(GL_TEXTURE_2D, material->specular);
-			glActiveTexture(GL_TEXTURE0 + 2);
-			glBindTexture(GL_TEXTURE_2D, material->emission);
-			glBindVertexArray(VAO);			
-			for (int i = 0; i < 10; i++) {
-				modelMat = glm::mat4(1.0f);
-				modelMat = glm::translate(modelMat, cubePositions[i]);
-				glUniformMatrix4fv(glGetUniformLocation(shader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-			}
-			
-			// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+			
+			shader->use();
+
+			// glBindVertexArray(VAO);
+			
+			// glDrawArrays(GL_POINTS, 0, position.size());
+			models[0]->Draw(shader);
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 		glfwTerminate();
 		return;
+	}
+
+	void add(Model* model) {
+		models.push_back(model);
 	}
 
 	unsigned int LoadImageToGpu(const char* img, GLint internalFormat, GLenum format, int textureSlot) {

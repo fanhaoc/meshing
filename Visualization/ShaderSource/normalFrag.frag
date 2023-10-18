@@ -84,4 +84,5 @@ void main()
     finalResult += CalcLightPoint(lightP, uNormal, dirToCamera);
     finalResult += texture(material.emission, TexCoord).rgb;
     FragColor = vec4(finalResult , 1.0);
+
 } 

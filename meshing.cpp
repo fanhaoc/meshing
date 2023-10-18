@@ -4,16 +4,26 @@
 #include "Octree.cpp"
 #include "ReadModel.cpp"
 #include "Visualization/Scene.cpp"
+#include "Visualization/Model.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 
-int main()
+int main(int argc, char* argv[])
 {
+	std::string exePath = argv[0];
+	
+
+	ReadModel* rm = new ReadModel();
+	rm->read(exePath.substr(0, exePath.find_last_of('\\')) + "\\model\\nanosuit\\nanosuit.obj");
+	Model* model = new Model(rm->meshes);
+
+	std::vector<glm::vec3> positions = model->extractPosition();
+
 	// 图形显示模块
 	Scene* sc = new Scene();
 	
-
+	sc->add(model);
 
 	// 文件读取模块
 	//ReadModel* rm = new ReadModel();
@@ -24,7 +34,7 @@ int main()
 
 	//sc->add(shape);
 
-	sc->renderLoop();
+	 sc->renderLoop(positions);
 	//std::cout << "vertex count" << vertex.size() << std::endl;
 	//// 创建八叉树根节点
 	//Octree* otr = new Octree(6, 1, BoundingBox(Point(-10, -10, -10), Point(10, 10, 10)));

@@ -2,35 +2,25 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <string>
-struct  Point
-{
-	float x, y, z;
-	Point(float a, float b, float c) {
-		x = a;
-		y = b;
-		z = c;
-	}
-	Point() :x(0), y(0), z(0) {}
-};
 
 struct BoundingBox
 {
-	Point minCoord;
-	Point maxCoord;
-	BoundingBox(Point& min, Point& max) {
+	glm::vec3 minCoord;
+	glm::vec3 maxCoord;
+	BoundingBox(glm::vec3 min, glm::vec3 max) {
 		minCoord = min;
 		maxCoord = max;
 	}
 	BoundingBox() {
-		minCoord = Point();
-		maxCoord = Point();
+		minCoord = glm::vec3(0, 0, 0);
+		maxCoord = glm::vec3(0, 0, 0);
 	}
 };
 
 struct OctreeNode
 {
 	BoundingBox bounds;
-	std::vector<Point> points;
+	std::vector<glm::vec3> points;
 	OctreeNode* children[8]; // 子节点数组
 
 	OctreeNode(const BoundingBox& bbox) {

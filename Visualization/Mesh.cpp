@@ -10,24 +10,41 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
-	setupMesh();
+	// setupMesh();
 }
 
-void Mesh::Draw(Shader* sahder)
+Mesh::Mesh(float vertices[])
 {
+	this->vertices.resize(36);
+	memcpy(&(this->vertices[0]), vertices, 36 * 8 * sizeof(float));
+	this->setupMesh();
+}
+
+void Mesh::Draw(Shader* shader)
+{
+	setupMesh();
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
 		if (textures[i].type == "texture_diffuse") {
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+			shader->setUniform1i("material.diffuse", 0);
 			
 		}
 		else if (textures[i].type == "texture_specular") {
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+			shader->setUniform1i("material.specular", 1);
 		}
 	}
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	// glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
 }
+
+
 
 void Mesh::setupMesh()
 {
@@ -46,10 +63,10 @@ void Mesh::setupMesh()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)3);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(GL_FLOAT)));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)6);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(GL_FLOAT)));
 
 	glBindVertexArray(0);
 }
