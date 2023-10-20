@@ -20,8 +20,43 @@ Mesh::Mesh(float vertices[])
 	this->setupMesh();
 }
 
+Mesh::Mesh(BoundingBox bb)
+{
+	std::vector<glm::vec3> points;
+	points.push_back(bb.minCoord);
+	points.push_back(bb.maxCoord);
+	for (unsigned int i = 0; i < 2; i++) {
+		for (unsigned int j = 0; j < 2; j++) {
+			for (unsigned int k = 0; k < 2; k++) {
+				Vertex vt;
+				vt.Position = glm::vec3(points[i].x, points[j].y, points[k].z);
+				vertices.push_back(vt);
+			}
+		}
+	}
+	// 生成index
+	unsigned int index[36] = {
+		0, 2, 3, 3, 1, 0,
+		4, 5, 7, 7, 6, 4,
+		0, 4, 6, 6, 2, 0,
+		1, 3, 7, 7, 5, 1,
+		2, 6, 7, 7, 3, 2,
+		0, 1, 5, 5, 4, 0
+	};
+	indices.resize(36);
+	memcpy(&indices[0], index, 36 * sizeof(unsigned int));
+}
+
+void Mesh::addCopy(glm::vec3 offset)
+{
+	offsets.push_back(offset);
+}
+
 void Mesh::Draw(Shader* shader)
 {
+	// 绘制设置
+	glPolygonMode(GL_FRONT_AND_BACK, MESH_MODE);
+
 	setupMesh();
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
@@ -29,6 +64,7 @@ void Mesh::Draw(Shader* shader)
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
 			shader->setUniform1i("material.diffuse", 0);
+			// 读取贴图...
 			
 		}
 		else if (textures[i].type == "texture_specular") {
@@ -38,8 +74,13 @@ void Mesh::Draw(Shader* shader)
 		}
 	}
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	// glDrawArrays(GL_TRIANGLES, 0, 36);
+	if (offsets.size() > 0) {
+		glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, offsets.size());
+		
+	}
+	else {
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	}
 	glBindVertexArray(0);
 	glActiveTexture(GL_TEXTURE0);
 }
@@ -67,6 +108,15 @@ void Mesh::setupMesh()
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(GL_FLOAT)));
+
+	if (offsets.size() > 0) {
+		glGenBuffers(1, &instanceVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * offsets.size(), &offsets[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+		glVertexAttribDivisor(3, 1);
+	}
 
 	glBindVertexArray(0);
 }

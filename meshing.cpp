@@ -20,11 +20,24 @@ int main(int argc, char* argv[])
 
 	std::vector<glm::vec3> positions = model->extractPosition();
 
+	// 创建八叉树根节点
+	Octree* otr = new Octree(MAX_DEPTH, MAX_PINTS, BoundingBox(glm::vec3(-10, -10, -10), glm::vec3(10, 10, 10)));
+	for (int i = 0; i < positions.size(); i++) {
+		otr->insertPoint(otr->root, positions[i], 0);
+	}
+	std::vector<Mesh> meshes;
+	std::vector<OctreeNode> boxs;
+	otr->getBoxHavePoints(otr->root, 0, boxs);
+	//for (int i = 0; i < boxs.size(); i++) {
+	//	meshes.push_back(Mesh(boxs[i].bounds));
+	//}
+	Model* model0 = new Model(boxs);
 	// 图形显示模块
 	Scene* sc = new Scene();
-	
+	camera->Position = glm::vec3(0, 10, 10);
+	sc->add(model0);
 	sc->add(model);
-
+	sc->renderLoop();
 	// 文件读取模块
 	//ReadModel* rm = new ReadModel();
 	//rm->read("C:/Users/19288/Desktop/coding/cxx/meshing/models/cylinder.obj");
@@ -34,7 +47,7 @@ int main(int argc, char* argv[])
 
 	//sc->add(shape);
 
-	 sc->renderLoop(positions);
+
 	//std::cout << "vertex count" << vertex.size() << std::endl;
 	//// 创建八叉树根节点
 	//Octree* otr = new Octree(6, 1, BoundingBox(Point(-10, -10, -10), Point(10, 10, 10)));

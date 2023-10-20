@@ -49,47 +49,36 @@ public:
 		glViewport(0, 0, 800, 600);
 
 		// 初始化组件
-		camera = new Camera(glm::vec3(0, 4.0f, 5.0f), -45.0f, 180.0f, glm::vec3(0, 1.0f, 0));
+		camera = new Camera(glm::vec3(0, 4.0f, 5.0f), 0.0f, 180.0f, glm::vec3(0, 1.0f, 0));
 		// 鼠标事件
 		glfwSetMouseButtonCallback(window, mouseButton_callback);
 
 		glfwSetScrollCallback(window, scroll_callback);
 	}
 	// 循环绘制
-	void renderLoop(std::vector<glm::vec3>& position) {
+	void renderLoop() {
 		// 初始化一些渲染数据
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		//glEnable(GL_CULL_FACE);
 		//glCullFace(GL_BACK);
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		 
 
 		Shader* shader = new Shader((rootPath + "\\Visualization\\ShaderSource\\normalVert.vert").c_str(), (rootPath+"\\Visualization\\ShaderSource\\normalFrag.frag").c_str());
 		Shader* shaderP = new Shader((rootPath + "\\Visualization\\ShaderSource\\pointVert.vert").c_str(), (rootPath + "\\Visualization\\ShaderSource\\pointFrag.frag").c_str());
 
-		material = new Material(shader,
-			LoadImageToGpu((rootPath + "\\sources\\container2.png").c_str(), GL_RGBA, GL_RGBA, Shader::DIFFUSE),
-			LoadImageToGpu((rootPath + "\\sources\\container2_specular.png").c_str(), GL_RGBA, GL_RGBA, Shader::SPECULAR),
-			LoadImageToGpu((rootPath + "\\sources\\matrix.jpg").c_str(), GL_RGB, GL_RGB, Shader::EMISSION),
-			glm::vec3(1.0f, 1.0f, 1.0f),
-			32.0f
-		);
+		//material = new Material(shader,
+		//	LoadImageToGpu((rootPath + "\\sources\\container2.png").c_str(), GL_RGBA, GL_RGBA, Shader::DIFFUSE),
+		//	LoadImageToGpu((rootPath + "\\sources\\container2_specular.png").c_str(), GL_RGBA, GL_RGBA, Shader::SPECULAR),
+		//	LoadImageToGpu((rootPath + "\\sources\\matrix.jpg").c_str(), GL_RGB, GL_RGB, Shader::EMISSION),
+		//	glm::vec3(1.0f, 1.0f, 1.0f),
+		//	32.0f
+		//);
 
-		Light* lightD = new Light(glm::vec3(0.0f, 10.0f, -5.0f), glm::vec3(glm::radians(45.0f), glm::radians(-45.0f), 0.0f), glm::vec3(2.0f, 2.0f, 2.0f));
+		Light* lightD = new Light(glm::vec3(0.0f, 30.0f, -20.0f), glm::vec3(glm::radians(180.0f), glm::radians(-45.0f), 0.0f), glm::vec3(2.0f, 2.0f, 2.0f));
 		Light* lightP = new Light(glm::vec3(0.0f, 1.0f, -1.0f), glm::vec3(glm::radians(45.0f), glm::radians(-45.0f), 0.0f), glm::vec3(0.0f, 2.0f, 2.0f));
 
 		// Mesh* cube = new  Mesh(vertices);
-		//unsigned int VAO;
-		//glGenVertexArrays(1, &VAO);
-		//glBindVertexArray(VAO);
-
-		//unsigned int VBO;
-		//glGenBuffers(1, &VBO);
-		//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * position.size(), &position[0], GL_STATIC_DRAW);
-
-		//glEnableVertexAttribArray(0);
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);	
 
 		
 		// mvp矩阵
@@ -100,7 +89,6 @@ public:
 
 		glm::mat4 projMat = glm::mat4(1.0f);
 		
-		std::cout << position.size() << std::endl;
 		// 循环渲染
 		while (!glfwWindowShouldClose(window))
 		{
@@ -116,8 +104,8 @@ public:
 			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
 
-			glUniform3f(glGetUniformLocation(shader->ID, "objColor"), 1.0f, 1.0f, 1.0f);
-			glUniform3f(glGetUniformLocation(shader->ID, "ambientColor"), 0.2f, 0.4f, 0.4f);
+			glUniform3f(glGetUniformLocation(shader->ID, "objColor"), 0.5f, 0.3f, 0.7f);
+			glUniform3f(glGetUniformLocation(shader->ID, "ambientColor"), 0.5f, 0.5f, 0.5f);
 			glUniform3f(glGetUniformLocation(shader->ID, "cameraPos"), camera->Position.x, camera->Position.y, camera->Position.z);
 
 			shader->setUniform3f("lightD.pos", lightD->position);
@@ -131,19 +119,20 @@ public:
 			shader->setUniform1f("lightP.linear", lightP->linear);
 			shader->setUniform1f("lightP.quadratic", lightP->quadratic);
 
-			material->shader->setUniform3f("material.ambient", material->ambient);
-			material->shader->setUniform1i("material.diffuse", Shader::DIFFUSE);
-			material->shader->setUniform1i("material.specular", Shader::SPECULAR);
-			material->shader->setUniform1i("material.emission", Shader::EMISSION);
-			material->shader->setUniform1f("material.shininess", material->shininess);
-
+			//material->shader->setUniform3f("material.ambient", material->ambient);
+			//material->shader->setUniform1i("material.diffuse", Shader::DIFFUSE);
+			//material->shader->setUniform1i("material.specular", Shader::SPECULAR);
+			//material->shader->setUniform1i("material.emission", Shader::EMISSION);
+			//material->shader->setUniform1f("material.shininess", material->shininess);
 			
 			shader->use();
 
 			// glBindVertexArray(VAO);
 			
 			// glDrawArrays(GL_POINTS, 0, position.size());
-			models[0]->Draw(shader);
+			for (int i = 0; i < models.size(); i++) {
+				models[i]->Draw(shader);
+			}
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}

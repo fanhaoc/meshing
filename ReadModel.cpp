@@ -15,7 +15,7 @@ public:
 	//aiNode* rootNode = nullptr;
 	Assimp::Importer importer;
 	/*std::vector<aiMesh*> meshes;*/
-	std::vector<Mesh> meshes;
+	std::vector<Mesh*> meshes;
 	std::string directory;
 	ReadModel() {
 
@@ -104,7 +104,7 @@ public:
 		importer.FreeScene();
 	}
 	
-	Mesh processMesh(aiMesh* mesh) {
+	Mesh* processMesh(aiMesh* mesh) {
 		std::vector<Vertex> tempVertices;
 		std::vector<unsigned int> tempIndices;
 		std::vector<Texture> tempTextures;
@@ -138,7 +138,7 @@ public:
 				tempIndices.push_back(mesh->mFaces[i].mIndices[j]);
 			}
 		}
-		return Mesh(tempVertices, tempIndices, {});
+		return new Mesh(tempVertices, tempIndices, {});
 	}
 	
 	//获取模型所有mesh

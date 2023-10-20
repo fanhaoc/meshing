@@ -3,8 +3,6 @@
 #include <iostream>
 #include "Types.h"
 
-const int MAX_DEPTH = 5; // 最大树深度
-const int MAX_PINTS = 1; // 每个立方体最多含有一个点
 
 class Octree {
 public:
@@ -14,7 +12,7 @@ public:
 	Octree(int depth, int size, BoundingBox& bbox) {
 		MAX_DEPTH = depth;
 		MAX_POINTS = size;
-		root = new OctreeNode(bbox);
+		root = new OctreeNode(bbox, 1);
 	}
 	// 计算点是否在边界框内
 	bool isPointInBox(const glm::vec3 point, const BoundingBox& box) {
@@ -88,7 +86,7 @@ public:
 		bd.push_back(BoundingBox(glm::vec3(centerX, centerY, centerZ), node->bounds.maxCoord)); // 8
 
 		for (int i = 0; i < 8; i++) {
-			node->children[i] = new OctreeNode(bd[i]);
+			node->children[i] = new OctreeNode(bd[i], node->level + 1);
 		}
 	}
 	// 遍历八叉树，获取所有的数据
@@ -100,6 +98,18 @@ public:
 		// 递归八个子节点
 		for (int i = 0; i < 8; i++) {
 			getAllPoints(node->children[i], depth + 1, points);
+		}
+	}
+
+	// 遍历八叉树， 获取有数据的节点
+	void getBoxHavePoints(OctreeNode* node, int depth, std::vector<OctreeNode>& box) {
+		if (node == nullptr) return;
+		if (node->points.size() > 0) {
+			box.push_back(*node);
+		}
+		// 递归八个子节点
+		for (int i = 0; i < 8; i++) {
+			getBoxHavePoints(node->children[i], depth + 1, box);
 		}
 	}
 };
