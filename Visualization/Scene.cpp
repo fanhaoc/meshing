@@ -58,14 +58,13 @@ public:
 	// 循环绘制
 	void renderLoop() {
 		// 初始化一些渲染数据
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		//glEnable(GL_CULL_FACE);
 		//glCullFace(GL_BACK);
 		 
 
 		Shader* shader = new Shader((rootPath + "\\Visualization\\ShaderSource\\normalVert.vert").c_str(), (rootPath+"\\Visualization\\ShaderSource\\normalFrag.frag").c_str());
-		Shader* shaderP = new Shader((rootPath + "\\Visualization\\ShaderSource\\pointVert.vert").c_str(), (rootPath + "\\Visualization\\ShaderSource\\pointFrag.frag").c_str());
 
 		//material = new Material(shader,
 		//	LoadImageToGpu((rootPath + "\\sources\\container2.png").c_str(), GL_RGBA, GL_RGBA, Shader::DIFFUSE),
@@ -104,7 +103,7 @@ public:
 			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
 
-			glUniform3f(glGetUniformLocation(shader->ID, "objColor"), 0.5f, 0.3f, 0.7f);
+			// glUniform3f(glGetUniformLocation(shader->ID, "objColor"), 0.5f, 0.3f, 0.7f);
 			glUniform3f(glGetUniformLocation(shader->ID, "ambientColor"), 0.5f, 0.5f, 0.5f);
 			glUniform3f(glGetUniformLocation(shader->ID, "cameraPos"), camera->Position.x, camera->Position.y, camera->Position.z);
 

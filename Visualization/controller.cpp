@@ -11,7 +11,7 @@ float maxFov = 75.0f;
 float minFov = 1.0f;
 float fovSense = 100.0f;
 
-float moveSense = 0.05f;
+float moveSense = 0.1f;
 
 Camera* camera; // ÉãÏñ»ú
 	

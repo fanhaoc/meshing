@@ -3,8 +3,8 @@
 #include <glm/glm.hpp>
 #include <string>
 
-const int MAX_DEPTH = 6; // 最大树深度
-const int MAX_PINTS = 5; // 每个立方体最多含有一个点
+const int MAX_DEPTH = 8; // 最大树深度
+const int MAX_PINTS = 10; // 每个立方体最多含有一个点
 
 struct BoundingBox
 {

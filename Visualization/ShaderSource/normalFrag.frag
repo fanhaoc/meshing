@@ -35,6 +35,7 @@ uniform vec3 ambientColor;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform vec3 cameraPos;
+uniform float needLight;
 
 out vec4 FragColor;
 
@@ -81,10 +82,16 @@ void main()
     vec3 finalResult = vec3(0.0, 0.0, 0.0);
     vec3 uNormal = normalize(Normal);
     vec3 dirToCamera = normalize(cameraPos - FragPos);
-    finalResult += CalcLightDirectional(lightD, uNormal, dirToCamera);
+    // finalResult += CalcLightDirectional(lightD, uNormal, dirToCamera);
     // finalResult += CalcLightPoint(lightP, uNormal, dirToCamera);
     // finalResult += texture(material.emission, TexCoord).rgb;
-    FragColor = vec4(finalResult * vec3(0.4, 0.2, 0.3) , 1.0);
-//    FragColor = vec4(objColor * ambientColor, 1.0);
+    // FragColor = vec4(finalResult * objColor , 1.0);
+    if(needLight == 1.0){
+         finalResult += CalcLightDirectional(lightD, uNormal, dirToCamera);
+         FragColor = vec4(finalResult * objColor , 1.0);
+    }else{
+        FragColor = vec4(objColor * ambientColor, 1.0);
+    }
+    
 
 } 

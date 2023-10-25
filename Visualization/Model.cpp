@@ -10,16 +10,31 @@ Model::Model(std::vector<Mesh*>& meshes)
 	this->meshes = meshes;
 }
 
-Model::Model(std::vector<OctreeNode>& nodes)
+Model::Model(const std::vector<OctreeNode>& nodes)
 {
 	
+	glm::vec3 colors[8] = {
+		glm::vec3(1.0, 1.0, 1.0),
+		glm::vec3(1.0, 1.0, 1.0),
+		glm::vec3(1.0, 0.0, 0.0),
+		glm::vec3(0.0, 1.0, 0.0),
+		glm::vec3(0.0, 0.0, 1.0),
+		glm::vec3(235.0 / 255.0, 126.0 / 255.0, 94.0 / 255.0),
+		glm::vec3(107.0/255.0, 221.0 / 255.0, 137.0 / 255.0),
+		glm::vec3(0.46, 0.56, 0.83),
+	};
+
 	std::map<unsigned int, Mesh*> maps;
 	for (int i = 0; i < nodes.size(); i++) {
 		auto haveMesh = maps.find(nodes[i].level);
 		if ( haveMesh == maps.end()) {
 			Mesh* mesh = new Mesh(nodes[i].bounds);
-			mesh->MESH_MODE = GL_LINE; // 使用线框模式绘制八叉树
+			mesh->shaderType = 1; // 使用octree的着色器
+			mesh->color = colors[nodes[i].level-1];
+			mesh->needLight = 0.0;
+			mesh->drawType = GL_LINES;
 			meshes.push_back(mesh);
+			maps[nodes[i].level] = mesh;
 		}
 		else {
 			Mesh* mesh = haveMesh->second;

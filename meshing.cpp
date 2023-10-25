@@ -5,6 +5,7 @@
 #include "ReadModel.cpp"
 #include "Visualization/Scene.cpp"
 #include "Visualization/Model.h"
+#include "./Algorithm/Ray.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -16,6 +17,7 @@ int main(int argc, char* argv[])
 
 	ReadModel* rm = new ReadModel();
 	rm->read(exePath.substr(0, exePath.find_last_of('\\')) + "\\model\\nanosuit\\nanosuit.obj");
+	//rm->read(exePath.substr(0, exePath.find_last_of('\\')) + "\\model\\cylinder\\cylinder.obj");
 	Model* model = new Model(rm->meshes);
 
 	std::vector<glm::vec3> positions = model->extractPosition();
@@ -23,20 +25,29 @@ int main(int argc, char* argv[])
 	// 创建八叉树根节点
 	Octree* otr = new Octree(MAX_DEPTH, MAX_PINTS, BoundingBox(glm::vec3(-10, -10, -10), glm::vec3(10, 10, 10)));
 	for (int i = 0; i < positions.size(); i++) {
-		otr->insertPoint(otr->root, positions[i], 0);
+		otr->insertPoint(otr->root, positions[i], 1);
 	}
-	std::vector<Mesh> meshes;
+
 	std::vector<OctreeNode> boxs;
-	otr->getBoxHavePoints(otr->root, 0, boxs);
-	//for (int i = 0; i < boxs.size(); i++) {
-	//	meshes.push_back(Mesh(boxs[i].bounds));
-	//}
+	//otr->getBoxHavePoints(otr->root, 0, boxs);
+	otr->getBoxOfLeaf(otr->root, 0, boxs);
 	Model* model0 = new Model(boxs);
+
+	// 获取所有位于内部的节点
+	Ray* ray = new Ray(boxs, rm->meshes);
+	std::vector<OctreeNode> innerOctree = ray->getInnerOctree();
+	Model* model1 = new Model(innerOctree);
+
+	
+
 	// 图形显示模块
 	Scene* sc = new Scene();
 	camera->Position = glm::vec3(0, 10, 10);
-	sc->add(model0);
-	sc->add(model);
+
+	//sc->add(model);
+	//sc->add(model0);
+	sc->add(model1);
+
 	sc->renderLoop();
 	// 文件读取模块
 	//ReadModel* rm = new ReadModel();

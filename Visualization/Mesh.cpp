@@ -13,12 +13,12 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	// setupMesh();
 }
 
-Mesh::Mesh(float vertices[])
-{
-	this->vertices.resize(36);
-	memcpy(&(this->vertices[0]), vertices, 36 * 8 * sizeof(float));
-	this->setupMesh();
-}
+//Mesh::Mesh(float vertices[])
+//{
+//	this->vertices.resize(36);
+//	memcpy(&(this->vertices[0]), vertices, 36 * 8 * sizeof(float));
+//	this->setupMesh();
+//}
 
 Mesh::Mesh(BoundingBox bb)
 {
@@ -35,17 +35,23 @@ Mesh::Mesh(BoundingBox bb)
 		}
 	}
 	// 生成index
-	unsigned int index[36] = {
-		0, 2, 3, 3, 1, 0,
-		4, 5, 7, 7, 6, 4,
-		0, 4, 6, 6, 2, 0,
-		1, 3, 7, 7, 5, 1,
-		2, 6, 7, 7, 3, 2,
-		0, 1, 5, 5, 4, 0
+	//unsigned int index[36] = {
+	//	0, 2, 3, 3, 1, 0,
+	//	4, 5, 7, 7, 6, 4,
+	//	0, 4, 6, 6, 2, 0,
+	//	1, 3, 7, 7, 5, 1,
+	//	2, 6, 7, 7, 3, 2,
+	//	0, 1, 5, 5, 4, 0
+	//};
+	unsigned int index[24] = {
+		0, 2, 2, 3, 3, 1, 1, 0,
+		6, 4, 4, 5, 5, 7, 7, 6,
+		0, 4, 2, 6, 3, 7, 1, 5
 	};
-	indices.resize(36);
-	memcpy(&indices[0], index, 36 * sizeof(unsigned int));
+	indices.resize(24);
+	memcpy(&indices[0], index, 24 * sizeof(unsigned int));
 }
+
 
 void Mesh::addCopy(glm::vec3 offset)
 {
@@ -55,7 +61,7 @@ void Mesh::addCopy(glm::vec3 offset)
 void Mesh::Draw(Shader* shader)
 {
 	// 绘制设置
-	glPolygonMode(GL_FRONT_AND_BACK, MESH_MODE);
+
 
 	setupMesh();
 	for (unsigned int i = 0; i < textures.size(); i++)
@@ -73,13 +79,16 @@ void Mesh::Draw(Shader* shader)
 			shader->setUniform1i("material.specular", 1);
 		}
 	}
+
+	shader->setUniform3f("objColor", color);
+	shader->setUniform1f("needLight", needLight);
+
 	glBindVertexArray(VAO);
 	if (offsets.size() > 0) {
-		glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, offsets.size());
-		
+		glDrawElementsInstanced(drawType, indices.size(), GL_UNSIGNED_INT, 0, offsets.size());
 	}
 	else {
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(drawType, indices.size(), GL_UNSIGNED_INT, 0);
 	}
 	glBindVertexArray(0);
 	glActiveTexture(GL_TEXTURE0);
@@ -113,8 +122,9 @@ void Mesh::setupMesh()
 		glGenBuffers(1, &instanceVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * offsets.size(), &offsets[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+		glEnableVertexAttribArray(3);
+
 		glVertexAttribDivisor(3, 1);
 	}
 

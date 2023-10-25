@@ -22,6 +22,9 @@ public:
 	}
 	//插入点到八叉树中
 	void insertPoint(OctreeNode* node,glm::vec3 point, int depth) {
+		//if (!isPointInBox(point, node->bounds)) {
+		//	return;
+		//}
 		if (depth == MAX_DEPTH) {
 			node->points.push_back(point);
 			return;
@@ -50,6 +53,13 @@ public:
 			int index = pointIndices(point, node);
 			insertPoint(node->children[index], point, depth + 1);
 		}
+
+		
+		//if (node->children[0] == nullptr) {
+		//	subdivideOctree(node);
+		//}
+		//int index = pointIndices(point, node);
+		//insertPoint(node->children[index], point, depth + 1);
 	}
 	// 计算点在节点中的索引
 	int pointIndices(glm::vec3 point, OctreeNode* node) {
@@ -106,10 +116,25 @@ public:
 		if (node == nullptr) return;
 		if (node->points.size() > 0) {
 			box.push_back(*node);
+			return;
 		}
 		// 递归八个子节点
 		for (int i = 0; i < 8; i++) {
 			getBoxHavePoints(node->children[i], depth + 1, box);
 		}
 	}
+	
+	// 遍历八叉树，得到所有的叶子节点
+	void getBoxOfLeaf(OctreeNode* node, int depth, std::vector<OctreeNode>& box) {
+		if (node == nullptr) return;
+		if (node->children[0] == nullptr) {
+			box.push_back(*node);
+			return;
+		}
+		// 递归八个子节点
+		for (int i = 0; i < 8; i++) {
+			getBoxOfLeaf(node->children[i], depth + 1, box);
+		}
+	}
+
 };

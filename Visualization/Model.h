@@ -8,7 +8,7 @@ class Model {
 public:
 	Model(Mesh* mesh);
 	Model(std::vector<Mesh*>& meshes);
-	Model(std::vector<OctreeNode>& nodes);
+	Model(const std::vector<OctreeNode>& nodes);
 	~Model();
 
 	std::vector<Mesh*> meshes;
